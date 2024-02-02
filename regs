@@ -1,0 +1,102 @@
+# @dp.message_handler(commands=['reg_director'])
+# async def process_director_role(message: types.Message):
+#     selected_role = message.text
+#     user_data[message.from_user.id] = {"role": selected_role, "state": Form.waiting_for_name}
+
+#     user_id = message.from_user.id
+
+#     # Initialize SQLite database connection
+#     conn = sqlite3.connect('school_data.db')
+#     cursor = conn.cursor()
+
+#     try:
+#         # Check if the user's chat ID is in the directors table
+#         cursor.execute('SELECT user_id FROM directors WHERE user_id = ?', (user_id,))
+#         if cursor.fetchone():
+#             await message.reply("Siz allaqachon ro'yhatdan o'tkansiz. Rahmat!")
+#         else:
+#             markup = types.ReplyKeyboardRemove()
+#             await message.reply("Iltimos, direktor ismingizni kiriting:", reply_markup=markup)
+#     finally:
+#         # Close the SQLite connection in the finally block to ensure it is always closed
+#         conn.close()
+
+
+
+
+
+# # Add these after the process_director_role handler
+# @dp.message_handler(lambda message: user_data.get(message.from_user.id) and user_data[message.from_user.id]["state"] == Form.waiting_for_name)
+# async def process_director_name(message: types.Message):
+#     user_data[message.from_user.id]["name"] = message.text
+#     user_data[message.from_user.id]["state"] = Form.waiting_for_scholl_number
+
+
+#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+#     school_number_buttons = [types.KeyboardButton(num) for num in scholl_numbers]
+#     markup.add(*school_number_buttons)
+
+#     await message.reply("Iltimos, maktab raqamini tanlang:", reply_markup=markup)
+
+
+
+
+# @dp.message_handler(lambda message: user_data.get(message.from_user.id) and user_data[message.from_user.id]["state"] == Form.waiting_for_scholl_number)
+# async def process_director_school_number(message: types.Message):
+#     user_data[message.from_user.id]["school_number"] = message.text
+#     user_data[message.from_user.id]["state"] = Form.waiting_for_phone
+
+#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+#     number = types.KeyboardButton("Raqamni jo'natish", request_contact=True)
+#     markup.row(number)
+
+#     await message.reply("Iltimos, raqamingizni jo'nating", reply_markup=markup)
+
+# @dp.message_handler(content_types=types.ContentType.CONTACT)
+# async def process_director_contact(message: types.Message):
+#     user_id = message.from_user.id
+#     user_name = user_data[user_id]["name"]
+#     user_phone = message.contact.phone_number
+#     school_number = user_data[user_id]["school_number"]
+
+#     random_code = secrets.token_hex(4)
+
+#     await message.answer(
+#         f"Direktor {user_name}, muvaffaqiyatli ro'yhatdan o'tdingiz. Rahmat!"
+
+#     )
+#     await message.answer(f"Bu sizning parolingiz <br>{random_code}<br> iltimos uni saqlab oling")
+
+#     # Update or insert director information in the database
+#     conn = sqlite3.connect('school_data.db')
+#     cursor = conn.cursor()
+
+#     try:
+#         cursor.execute('SELECT user_id FROM directors WHERE user_id = ?', (user_id,))
+#         existing_director = cursor.fetchone()
+
+#         if existing_director:
+#             cursor.execute('''
+#                 UPDATE directors
+#                 SET director_name=?, director_phone=?, school_number=?, pass=?
+#                 WHERE user_id=?
+#             ''', (user_name, user_phone, school_number, random_code, user_id))
+#         else:
+#             cursor.execute('''
+#                 INSERT INTO directors (user_id, director_name, director_phone, school_number, pass)
+#                 VALUES (?, ?, ?, ?, ?)
+#             ''', (user_id, user_name, user_phone, school_number, random_code))
+
+#         conn.commit()
+
+#         user_data[user_id]["state"] = None
+
+#     except sqlite3.Error as e:
+#         print(f"SQLite error: {e}")
+#         # Handle the error (log it, send a message to the user, etc.)
+
+#     finally:
+#         conn.close()
+
+
+
